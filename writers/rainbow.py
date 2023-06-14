@@ -2,7 +2,7 @@
 import subprocess
 
 def pingit(x, y, colour):
-    addr = f"2400:8902:e001:233:{x:02x}{y:02x}:{colour[0]:02x}:{colour[1]:02x}:{colour[2]:02x}"
+    addr = f"2607:fa18:9ffe:4:{x:02x}{y:02x}:{colour[0]:02x}:{colour[1]:02x}:{colour[2]:02x}"
     subprocess.run(["ping6", "-c1", addr])
 
 red    = (0xcf, 0x0f, 0x0f)

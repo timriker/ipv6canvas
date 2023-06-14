@@ -57,11 +57,9 @@
                 <strong>Hello!</strong> You can draw on this canvas with IPv6!
             </p>
             <p>
-                Just ping <code>2400:8902:e001:233:XXYY:RR:GG:BB</code>, substituting a coordinate and colour.
+                Ping <code>2607:fa18:9ffe:4:XXYY:RR:GG:BB</code>, substituting a coordinate and color.
             </p>
-            <p>
-                Read more <a href="https://blog.tugzrida.xyz/2023/02/06/introducing-the-ipv6-canvas/">on my blog</a>
-            </p>
+            <p>Based on <a href="https://github.com/Tugzrida/ipv6canvas">ipv6canvas</a></p>
         </div>
 
         <span id="status" title="Disconnected">🔴</span>
@@ -71,14 +69,14 @@
             const ctx = document.querySelector("canvas").getContext("2d")
             ctx.scale(12/3, 12)
 
-            const mqtt = new Paho.Client("wss://ipv6canvas.tugzrida.xyz:8884/", "")
+            const mqtt = new Paho.Client("wss://ipv6canvas.rikers.org:8884/", "")
 
             mqtt.onMessageArrived = m => {
                 const y = parseInt(m.topic),
-                    colourArray = m.payloadBytes;
+                    colorArray = m.payloadBytes;
 
-                for (let crs = 0; crs < colourArray.length; crs += 3) {
-                    ctx.fillStyle = `rgb(${colourArray[crs]},${colourArray[crs+1]},${colourArray[crs+2]})`
+                for (let crs = 0; crs < colorArray.length; crs += 3) {
+                    ctx.fillStyle = `rgb(${colorArray[crs]},${colorArray[crs+1]},${colorArray[crs+2]})`
                     ctx.fillRect(crs, y, 3, 1)
                 }
             }

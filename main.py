@@ -133,7 +133,7 @@ canvas.startPublishing()
 ratelim = RateLimiter()
 ratelim.startReaping()
 
-canvasPrefix = socket.inet_pton(socket.AF_INET6, "2400:8902:e001:233::")[:8]
+canvasPrefix = socket.inet_pton(socket.AF_INET6, "2607:fa18:9ffe:4::")[:8]
 
 sock = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_ICMPV6)
 sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_RECVPKTINFO, 1)
@@ -147,6 +147,7 @@ while True:
 
         if pingDst[:8] == canvasPrefix and ratelim.count(data[3][0]):
             # 2400:8902:e001:233:XXYY:RR:GG:BB
+            # 2607:fa18:9ffe:4:XXYY:RR:GG:BB
             x = pingDst[8]
             y = pingDst[9]
             r = pingDst[11]

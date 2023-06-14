@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# Blatant Self-Advertising on the IPv6 Canvas
+# https://ewpratten.com/blog/ipv6-canvas/
+# https://github.com/ewpratten/v6-canvas-writer
+
 from PIL import Image
 from pathlib import Path
 from typing import List

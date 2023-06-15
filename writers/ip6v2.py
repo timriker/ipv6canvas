@@ -12,14 +12,15 @@ import time, random
 
 from PIL import Image
 
-base_address = "2a01:4f8:c012:f8e6:1"
+s=1
+base_address = "2a01:4f8:c012:f8e6:"
 pixels = []
 
 sock = socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6)
 
 def make_address(x, y, r, g, b, a):
     #final_address = f"{base_address}:{x:04x}:{y:04x}:{r:02x}{g:02x}:{b:02x}{a:02x}"
-    final_address = f"{base_address}{x:03x}:{y:04x}:{r:02x}:{g:02x}{b:02x}"
+    final_address = f"{base_address}{s}{x:03x}:{y:04x}:{r:02x}:{g:02x}{b:02x}"
 
     return final_address
 
@@ -54,26 +55,17 @@ def make_image_and_start(ox, oy, image_path, to_file=False, filename="image.txt"
     max_h -= 1
 
     # Now, let's convert the image
-    while True:
-        coordinates = x, y = curr_w, curr_h
-        r, g, b, a = image.getpixel(coordinates)
+    for curr_h in range(0, max_h, s):
+        for curr_w in range(0, max_w, s):
+            coordinates = x, y = curr_w, curr_h
 
-        # Check for alpha (transparency support)
-        if a > 0:
-            pixels.append(make_address(curr_w + start_w, curr_h + start_h, r, g, b, a))
+            r, g, b, a = image.getpixel(coordinates)
 
-        # Basic printer that goes left-> right and starts again
-        if curr_h == max_h:
-            curr_h = 0
-            curr_w += 1
-            print(f"Converting: {x},{y} -> {r}:{g}:{b}/{a}", end="\r")
-        else:
-            curr_h += 1
 
-        if curr_w == max_w and curr_h == max_h:
-            curr_h = start_h
-            curr_w = start_w
-            break
+            # Check for alpha (transparency support)
+            if a > 0:
+                pixels.append(make_address(curr_w + start_w, curr_h + start_h, r, g, b, a))
+        print(f"Converting: {x},{y} -> {r}:{g}:{b}/{a}", end="\r")
 
     # shuffle "pixel" in randomly
     random.shuffle(pixels)

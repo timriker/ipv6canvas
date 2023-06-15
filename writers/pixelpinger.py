@@ -57,8 +57,6 @@ def make_image_and_start(ox, oy, image_path, to_file=False, filename="image.txt"
         coordinates = x, y = curr_w, curr_h
         r, g, b, a = image.getpixel(coordinates)
 
-        print(f"Converting: {x},{y} -> {r}:{g}:{b}/{a}", end="\r")
-
         # Check for alpha (transparency support)
         if a > 0:
             pixels.append(make_address(curr_w + start_w, curr_h + start_h, r, g, b, a))
@@ -67,6 +65,7 @@ def make_image_and_start(ox, oy, image_path, to_file=False, filename="image.txt"
         if curr_h == max_h:
             curr_h = 0
             curr_w += 1
+            print(f"Converting: {x},{y} -> {r}:{g}:{b}/{a}", end="\r")
         else:
             curr_h += 1
 
@@ -86,7 +85,6 @@ def make_image_and_start(ox, oy, image_path, to_file=False, filename="image.txt"
             do_ping(addr)
     else:
         write_to_file(filename)
-
 
 if __name__ == "__main__":
     if not argv or len(argv) < 4 or "--help" in argv:

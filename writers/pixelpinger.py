@@ -8,6 +8,7 @@
 from platform import system
 from sys import argv
 from socket import socket, AF_INET6, SOCK_RAW, IPPROTO_ICMPV6
+import time, random
 
 from PIL import Image
 
@@ -16,8 +17,8 @@ pixels = []
 
 sock = socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6)
 
-def make_address(x, y, r, g, b):
-    final_address = f"{base_address}:{x:02x}{y:02x}:{r:02x}:{g:02x}:{b:02x}"
+def make_address(x, y, r, g, b, a):
+    final_address = f"{base_address}:{x:04x}:{y:04x}:{r:02x}{g:02x}:{b:02x}{a:02x}"
 
     return final_address
 
@@ -27,6 +28,7 @@ def do_ping(dest_addr, timeout=1):
     try:
         # Raw sockets, who cares, it's fast
         sock.sendto(b"\x80\0\0\0\0\0\0\0", (dest_addr, 0))
+        time.sleep(0.002)
     except:
         # We don't care about failing
         # The pixel is usually re-written in next pass
@@ -59,7 +61,7 @@ def make_image_and_start(ox, oy, image_path, to_file=False, filename="image.txt"
 
         # Check for alpha (transparency support)
         if a > 0:
-            pixels.append(make_address(curr_w + start_w, curr_h + start_h, r, g, b))
+            pixels.append(make_address(curr_w + start_w, curr_h + start_h, r, g, b, a))
 
         # Basic printer that goes left-> right and starts again
         if curr_h == max_h:
@@ -72,6 +74,9 @@ def make_image_and_start(ox, oy, image_path, to_file=False, filename="image.txt"
             curr_h = start_h
             curr_w = start_w
             break
+
+    # shuffle pixels randomly
+    random.shuffle(pixels)
 
     print("Starting the render")
 

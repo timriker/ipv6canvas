@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import subprocess
 
-def pingit(x, y, colour):
-    addr = f"2607:fa18:9ffe:4:{x:02x}{y:02x}:{colour[0]:02x}:{colour[1]:02x}:{colour[2]:02x}"
+def pingit(x, y, color):
+    addr = f"2607:fa18:9ffe:4:{x:04x}:{y:04x}:{color[0]:02x}{color[1]:02x}:{color[2]:02x}ff"
     subprocess.run(["ping6", "-c1", addr])
 
 red    = (0xcf, 0x0f, 0x0f)
@@ -15,6 +15,6 @@ purple = (0x4d, 0x14, 0x8c)
 row = [purple, purple, blue, blue, green, green, yellow, yellow, orange, orange, red, red]
 
 for y in range(255, 243, -1):
-    for x, colour in enumerate(row):
-        pingit(255-x, y, colour)
+    for x, color in enumerate(row):
+        pingit(255-x, y, color)
     row.pop(0)

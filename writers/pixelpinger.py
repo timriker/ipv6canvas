@@ -23,12 +23,11 @@ def make_address(x, y, r, g, b, a):
     return final_address
 
 def do_ping(dest_addr, timeout=1):
-    print(f"Rendering current: {dest_addr}", end="\r")
+    #print(f"Rendering current: {dest_addr}", end="\r")
 
     try:
         # Raw sockets, who cares, it's fast
         sock.sendto(b"\x80\0\0\0\0\0\0\0", (dest_addr, 0))
-        time.sleep(0.002)
     except:
         # We don't care about failing
         # The pixel is usually re-written in next pass
@@ -77,12 +76,13 @@ def make_image_and_start(ox, oy, image_path, to_file=False, filename="image.txt"
     # shuffle pixels randomly
     random.shuffle(pixels)
 
-    print("Starting the render")
-
     if not to_file:
-        #while True:
-        for addr in pixels:
-            do_ping(addr)
+        while True:
+            print("Sending", len(pixels), "pings")
+            for addr in pixels:
+                time.sleep(0.00001)
+                do_ping(addr)
+            break
     else:
         write_to_file(filename)
 

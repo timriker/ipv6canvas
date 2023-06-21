@@ -80,6 +80,7 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
         try:
             resize_width, resize_height = map(int, resize.split('x'))
             im = im.resize((resize_width, resize_height))
+            print(f"Resized to: {resize}")
         except ValueError:
             print(f"Invalid resize format: {resize}")
             return
@@ -88,6 +89,7 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
     if offset:
         try:
             offset_x, offset_y = map(int, offset.split('x'))
+            print(f"Offset: {offset}")
         except ValueError:
             print(f"Invalid offset format: {offset}")
             return
@@ -114,6 +116,8 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
 
             addresses.append(address)
 
+    print("Packets:", len(addresses))
+
     # Shuffle the list
     random.shuffle(addresses)
 
@@ -127,6 +131,9 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2 * 1024 * 1024)
 
         while True:
+            # Record the start time
+            start_time = time.time()
+
             for address in addresses:
                 # Create the ICMPv6 packet
                 packet = create_icmpv6_packet(address, reply=reply, calculate_checksum=calculate_checksum)
@@ -150,6 +157,7 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
 
                 time.sleep(delay / 1000)
 
+            print(f"Sent {len(addresses)} packets in {(time.time() - start_time):.4f} seconds", end='\r')
             if not loop:
                 break
 

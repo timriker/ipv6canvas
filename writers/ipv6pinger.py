@@ -8,6 +8,7 @@ import argparse
 import socket
 import struct
 import random
+import errno
 from PIL import Image
 import time
 
@@ -17,11 +18,11 @@ def old_parse_ipv6_address(ipv6_prefix, x, y, red, green, blue, alpha):
     address += format(red, 'x').zfill(2) + ':' + format(green, 'x').zfill(2) + format(blue, 'x').zfill(2)
     return address
 
-def parse_ipv6_address(ipv6_prefix, x, y, red, green, blue, alpha, use_half=False):
+def parse_ipv6_address(ipv6_prefix, x, y, red, green, blue, alpha, half=False):
     address = ipv6_prefix + ':'
-    segment_x = '1' if not use_half else '2'
-    segment_x += format(x, 'x').zfill(3) if not use_half else format(x * 2, 'x').zfill(3)
-    segment_y = format(y, 'x').zfill(4) if not use_half else format(y * 2, 'x').zfill(4)
+    segment_x = '1' if not half else '2'
+    segment_x += format(x, 'x').zfill(3) if not half else format(x * 2, 'x').zfill(3)
+    segment_y = format(y, 'x').zfill(4) if not half else format(y * 2, 'x').zfill(4)
     address += segment_x + ':' + segment_y + ':'
     address += format(red, 'x').zfill(2) + ':' + format(green, 'x').zfill(2) + format(blue, 'x').zfill(2)
     return address
@@ -67,6 +68,22 @@ def calculate_checksum(data):
 
     return struct.pack('!H', checksum)
 
+def send_packets(sock, addresses, packets, delay, verbose):
+    for address, packet in zip(addresses, packets):
+        while True:
+            try:
+                sock.sendto(packet, (address, 0))
+                break  # Sent successfully, exit the loop
+            except OSError as e:
+                if e.errno == errno.ENOBUFS:
+                    time.sleep(0.01)  # Wait for 0.01 seconds
+                else:
+                    raise e  # Re-raise other exceptions
+        if verbose:
+            print(f"Sent ICMPv6 packet to {address}", end='\r')
+        time.sleep(delay / 1000.0)  # Convert delay to seconds
+
+
 def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha=60, verbose=False, loop=False, reply=False, delay=0, output=False, half=False, calculate_checksum=False):
     # Load the image using PIL
     try:
@@ -99,9 +116,14 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
     # list of addresses to ping
     addresses = []
 
+    x_range = range(0, im.width, 2 if half else 1)
+    y_range = range(0, im.height, 2 if half else 1)
+
+    print(f"{im.width} {im.height}")
     # Iterate through each pixel in the image
-    for y in range(im.height):
-        for x in range(im.width):
+    for y in x_range:
+        for x in y_range:
+            #print(f"{x} {y}")
             # Calculate the coordinates with offset
             coord_x = x + offset_x
             coord_y = y + offset_y
@@ -131,37 +153,23 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
         # Increase the socket buffer size
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 2 * 1024 * 1024)
 
-        while True:
-            # Record the start time
-            start_time = time.time()
+        packets = []
 
+        while True:
             for address in addresses:
                 # Create the ICMPv6 packet
                 packet = create_icmpv6_packet(address, reply=reply, calculate_checksum=calculate_checksum)
 
-                # Send the ICMPv6 packet
-                while True:
-                    try:
-                        sock.sendto(packet, (address, 0, 0, 0))
-                        break
-                    except socket.error as e:
-                        if e.errno == 105:
-                            if verbose:
-                                print("No buffer space available, retrying...", end="\r")
-                            time.sleep(.01)
-                        else:
-                            print(f"Failed to send ICMPv6 packet to {address}: {e}")
-                            break
+                packets.append(packet)
 
-                if verbose:
-                    print(f"Sent ICMPv6 packet to {address}", end='\r')
+            # Record the start time
+            start_time = time.time()
 
-                time.sleep(delay / 1000)
+            send_packets(sock, addresses, packets, delay, verbose)
 
             print(f"Sent {len(addresses)} packets in {(time.time() - start_time):.4f} seconds", end='\r')
             if not loop:
                 break
-
 
         # Close the socket
         sock.close()

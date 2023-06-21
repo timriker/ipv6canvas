@@ -168,18 +168,18 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
 
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description='Ping an IPv6 site using raw sockets based on image pixel values.')
-parser.add_argument('image', help='PNG image file')
+parser.add_argument('image', help='image file')
 parser.add_argument('--prefix', '-P', help='IPv6 prefix (default: ::)')
-parser.add_argument('--resize', '-r', help='Resize image in format XxY (e.g., 640x480)')
-parser.add_argument('--offset', '-o', help='Offset in format XxY (e.g., 100x50)')
 parser.add_argument('--alpha', '-A', type=int, default=60, help='Ignore pixels with alpha less than this value (default: 60)')
-parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
-parser.add_argument('--loop', '-l', action='store_true', help='Loop through the image continuously')
-parser.add_argument('--reply', '-R', action='store_true', help='Send ICMPv6 reply packets instead of request packets')
-parser.add_argument('--delay', '-d', type=int, default=0, help='Delay in milliseconds between sending packets (default: 0)')
-parser.add_argument('--output', '-O', action='store_true', help='Write IP addresses to stdout instead of sending pings')
-parser.add_argument('--half', '-H', action='store_true', help='Skip every other IP on both x and y axes, use "2" in IP address instead of "1"')
 parser.add_argument('--checksum', '-c', action='store_true', default=False, help='Calculate checksums in the ICMPv6 packets')
+parser.add_argument('--delay', '-d', type=int, default=0, help='Delay in milliseconds between sending packets (default: 0)')
+parser.add_argument('--half', '-H', action='store_true', help='Skip every other IP on both x and y axes, use "2" in IP address instead of "1"')
+parser.add_argument('--loop', '-l', action='store_true', help='Loop through the image continuously')
+parser.add_argument('--offset', '-o', help='Offset in format XxY (e.g., 100x50)')
+parser.add_argument('--output', '-O', action='store_true', help='Write IP addresses to stdout instead of sending pings')
+parser.add_argument('--reply', '-R', action='store_true', help='Send ICMPv6 reply packets instead of request packets')
+parser.add_argument('--resize', '-r', help='Resize image in format XxY (e.g., 640x480)')
+parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
 
 args = parser.parse_args()
 

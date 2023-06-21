@@ -155,13 +155,12 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
 
         packets = []
 
+        for address in addresses:
+            # Create the ICMPv6 packet
+            packet = create_icmpv6_packet(address, reply=reply, calculate_checksum=calculate_checksum)
+            packets.append(packet)
+
         while True:
-            for address in addresses:
-                # Create the ICMPv6 packet
-                packet = create_icmpv6_packet(address, reply=reply, calculate_checksum=calculate_checksum)
-
-                packets.append(packet)
-
             # Record the start time
             start_time = time.time()
 

@@ -18,12 +18,12 @@ pixels = []
 sock = socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6)
 
 def make_address(x, y, r, g, b, a):
-    final_address = f"{base_address}:{x:04x}:{y:04x}:{r:02x}{g:02x}:{b:02x}{a:02x}"
+    final_address = f"{base_address}:1{x:03x}:{y:04x}:{r:02x}:{g:02x}{b:02x}"
 
     return final_address
 
 def do_ping(dest_addr, timeout=1):
-    #print(f"Rendering current: {dest_addr}", end="\r")
+    print(f"Rendering current: {dest_addr}", end="\r")
 
     try:
         # Raw sockets, who cares, it's fast
@@ -82,6 +82,7 @@ def make_image_and_start(ox, oy, image_path, to_file=False, filename="image.txt"
             for addr in pixels:
                 time.sleep(0.00001)
                 do_ping(addr)
+            print("\nSent", len(pixels), "pings")
             break
     else:
         write_to_file(filename)

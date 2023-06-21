@@ -122,7 +122,8 @@ def ping_ipv6_site(image_file, ipv6_prefix='::', resize=None, offset=None, alpha
     random.shuffle(addresses)
 
     if output:
-        print(address)
+        for address in addresses:
+            print(address)
     else:
         # Create a socket for sending ICMPv6 packets
         sock = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_ICMPV6)
